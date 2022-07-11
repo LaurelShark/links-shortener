@@ -1,0 +1,39 @@
+micronaut:
+  application:
+    name: go
+  openapi:
+    config:
+      file: openapi.properties
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
+  server:
+    host: localhost
+    port: 8080
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+datasources:
+  default:
+    url: jdbc:postgresql://localhost:5432/micro
+    username: postgres
+    password: qwer1234
+    driverClassName: org.postgresql.Driver
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true
+    entity-scan:
+      packages: 'com.saveme.go.entity'
+
