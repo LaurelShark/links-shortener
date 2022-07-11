@@ -14,7 +14,7 @@ dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.data:micronaut-data-processor:3.4.3")
 
-    implementation('com.h2database:h2:1.4.194')
+    implementation('com.h2database:h2:2.1.212')
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("jakarta.annotation:jakarta.annotation-api")
@@ -55,7 +55,7 @@ micronaut {
         annotations("go.*")
     }
 }
-tasks.withType(JavaCompile){
+tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
     options.compilerArgs.add('-parameters')
     options.fork = true

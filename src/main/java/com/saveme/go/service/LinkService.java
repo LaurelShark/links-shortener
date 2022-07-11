@@ -12,13 +12,14 @@ import java.net.URISyntaxException;
 @Bean
 public class LinkService {
 
+    public static final String URI_NOT_FOUND = "Redirect URI not found!";
     @Value("${micronaut.server.host}")
     private String host;
     @Value("${micronaut.server.port}")
     private String port;
 
-    private LinkRepository linkRepository;
-    private CodecService codecService;
+    private final LinkRepository linkRepository;
+    private final CodecService codecService;
 
     public LinkService(LinkRepository linkRepository, CodecService codecService) {
         this.linkRepository = linkRepository;
@@ -34,7 +35,7 @@ public class LinkService {
                 redirectUri = new URI(originalLink);
             }
         } else {
-            throw new RuntimeException("Redirect URI not found!");
+            throw new RuntimeException(URI_NOT_FOUND);
         }
         return redirectUri;
     }
