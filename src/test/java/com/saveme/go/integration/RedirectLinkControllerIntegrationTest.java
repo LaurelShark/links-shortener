@@ -16,11 +16,8 @@ import javax.persistence.EntityManager;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
-//@Testcontainers
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RedirectLinkControllerIntegrationTest {
 
-    //    private final IntegrationTestConfig container = IntegrationTestConfig.getInstance();
     @Inject
     EmbeddedServer embeddedServer;
     @Inject
