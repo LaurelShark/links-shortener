@@ -26,7 +26,7 @@ class RedirectLinkControllerTest {
 
     @Test
     void shouldRedirectToOriginalLink() throws URISyntaxException {
-        when(linkService.redirect(anyString())).thenReturn(new URI("https://original"));
+        when(linkService.getRedirectURL(anyString())).thenReturn(new URI("https://original"));
 
         var redirect = subject.redirect("https://short");
 

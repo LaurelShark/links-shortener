@@ -13,20 +13,19 @@ import java.net.URISyntaxException;
 public class LinkService {
 
     public static final String URI_NOT_FOUND = "Redirect URI not found!";
+    private final LinkRepository linkRepository;
+    private final CodecService codecService;
     @Value("${micronaut.server.host}")
     private String host;
     @Value("${micronaut.server.port}")
     private String port;
-
-    private final LinkRepository linkRepository;
-    private final CodecService codecService;
 
     public LinkService(LinkRepository linkRepository, CodecService codecService) {
         this.linkRepository = linkRepository;
         this.codecService = codecService;
     }
 
-    public URI redirect(String link) throws URISyntaxException {
+    public URI getRedirectURL(String link) throws URISyntaxException {
         var original = linkRepository.getOriginalByShort(link);
         URI redirectUri = null;
         if (original != null) {
@@ -41,6 +40,9 @@ public class LinkService {
     }
 
     public LinkDto getShortLink(String link) {
+        if (link == null) {
+            throw new RuntimeException("No link provided");
+        }
         var shortByOriginal = linkRepository.getShortByOriginal(link);
         return LinkDto.builder()
                 .shortLink(getShortLink(link, shortByOriginal))
@@ -52,7 +54,11 @@ public class LinkService {
         String shortLink = shortByOriginal != null
                 ? shortByOriginal.getShortLink()
                 : generateShortLink(link);
-        return host + ":" + port + "/" + shortLink;
+        return toServerLink(shortLink);
+    }
+
+    private String toServerLink(String hash) {
+        return host + ":" + port + "/" + hash;
     }
 
     private String generateShortLink(String link) {

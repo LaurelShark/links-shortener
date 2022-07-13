@@ -18,6 +18,6 @@ public class RedirectLinkController {
 
     @Get("/{link}")
     public HttpResponse redirect(String link) throws URISyntaxException {
-        return HttpResponse.redirect(linkService.redirect(link));
+        return HttpResponse.redirect(linkService.getRedirectURL(link));
     }
 }

@@ -4,8 +4,6 @@ import com.saveme.go.entity.Link;
 import com.saveme.go.repository.LinkRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,20 +27,17 @@ class LinkServiceTest {
     @InjectMocks
     LinkService subject;
 
-    @Captor
-    ArgumentCaptor<String> captor;
-
     @Test
     void shouldNotRedirect_whenOriginalURIDoesntExist() {
         when(linkRepository.getOriginalByShort(anyString())).thenReturn(null);
-        assertThrows(RuntimeException.class, () -> subject.redirect(HTTPS_SHORT), URI_NOT_FOUND);
+        assertThrows(RuntimeException.class, () -> subject.getRedirectURL(HTTPS_SHORT), URI_NOT_FOUND);
     }
 
     @Test
     void shouldRedirectByOriginalURI() throws URISyntaxException {
         when(linkRepository.getOriginalByShort(HTTPS_SHORT)).thenReturn(new Link(UUID.randomUUID(), HTTPS_ORIGINAL, HTTPS_SHORT));
 
-        var redirect = subject.redirect(HTTPS_SHORT);
+        var redirect = subject.getRedirectURL(HTTPS_SHORT);
 
         assertEquals("original", redirect.getHost());
         assertEquals("https", redirect.getScheme());
