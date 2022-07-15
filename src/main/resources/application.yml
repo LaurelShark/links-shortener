@@ -32,8 +32,13 @@ jpa:
     properties:
       hibernate:
         hbm2ddl:
-          auto: update
+          auto: none
         show_sql: true
     entity-scan:
       packages: 'com.saveme.go.entity'
-
+liquibase:
+  username: sa
+  password: ''
+  datasources:
+    default:
+      change-log: 'classpath:db/liquibase-changelog.yml'

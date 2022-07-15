@@ -20,21 +20,21 @@ public class LinkRepositoryImpl implements LinkRepository {
     @Override
     @ReadOnly
     public Link getShortByOriginal(String link) {
-        String qlString = "SELECT l FROM com.saveme.go.entity.Link as l WHERE l.originalLink = \'" + link + "\'" ;
+        String qlString = "SELECT l FROM com.saveme.go.entity.Link as l WHERE l.originalLink = '" + link + "'";
         return getLink(qlString);
     }
 
     @Override
     @ReadOnly
     public Link getOriginalByShort(String link) {
-        String qlString = "SELECT l FROM com.saveme.go.entity.Link as l WHERE l.shortLink = \'" + link + "\'" ;
+        String qlString = "SELECT l FROM com.saveme.go.entity.Link as l WHERE l.shortLink = '" + link + "'";
         return getLink(qlString);
     }
 
     @Override
     @Transactional
     public Link save(Link link) {
-        entityManager.persist(link);
+        entityManager.merge(link);
         return link;
     }
 

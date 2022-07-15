@@ -7,9 +7,8 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
 class LinkShortenerControllerIntegrationTest {
@@ -24,15 +23,28 @@ class LinkShortenerControllerIntegrationTest {
     @Test
     void shouldNotGenerateShortLinkResponse() {
         var originalLink = "";
-        assertThrows(RuntimeException.class, () -> getShortLink(originalLink), "No link provided");
+        Assertions.assertThrows(RuntimeException.class, () -> getShortLink(originalLink), "No link provided");
     }
 
     @Test
     void shouldGenerateShortLinkResponse() {
         var originalLink = "https://original";
         var res = getShortLink(originalLink);
-        assertEquals(originalLink, res.getOriginalLink());
-        assertNotNull(res.getShortLink());
+        Assertions.assertEquals(originalLink, res.getOriginalLink());
+        Assertions.assertNotNull(res.getShortLink());
+    }
+
+    @Test
+    void shouldIncrementClickCountOfShortLink() throws InterruptedException {
+        var originalLink = "https://www.google.com";
+        var beforeClick = getShortLink(originalLink);
+        var split = beforeClick.getShortLink().split("/");
+        httpClient.toBlocking().retrieve(HttpRequest.GET("/" + split[1]));
+
+        var afterClick = getShortLink(originalLink);
+
+        Assertions.assertEquals(0, beforeClick.getTimesClicked());
+        Assertions.assertEquals(1, afterClick.getTimesClicked());
     }
 
     private LinkDto getShortLink(String originalLink) {

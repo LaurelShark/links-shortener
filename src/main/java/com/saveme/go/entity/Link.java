@@ -1,10 +1,6 @@
 package com.saveme.go.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -13,6 +9,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "link")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,6 +21,8 @@ public class Link {
     private String originalLink;
     @Column(name = "short_link")
     private String shortLink;
+    @Column(name = "times_clicked")
+    private Integer timesClicked;
 
     @Override
     public boolean equals(Object o) {

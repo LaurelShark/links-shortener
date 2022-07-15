@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: yaroslavkladko
+      changes:
+        - createTable:
+            tableName: link
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: original_link
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: short_link
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: yaroslavkladko
+      changes:
+        - addColumn:
+            tableName: link
+            columns:
+              - column:
+                  name: times_clicked
+                  type: integer

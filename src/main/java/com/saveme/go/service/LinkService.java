@@ -1,5 +1,6 @@
 package com.saveme.go.service;
 
+import com.saveme.go.converter.LinkDtoEntityConverter;
 import com.saveme.go.dto.LinkDto;
 import com.saveme.go.entity.Link;
 import com.saveme.go.repository.LinkRepository;
@@ -15,28 +16,28 @@ public class LinkService {
     public static final String URI_NOT_FOUND = "Redirect URI not found!";
     private final LinkRepository linkRepository;
     private final CodecService codecService;
+    private final LinkDtoEntityConverter linkDtoEntityConverter;
     @Value("${micronaut.server.host}")
     private String host;
     @Value("${micronaut.server.port}")
     private String port;
 
-    public LinkService(LinkRepository linkRepository, CodecService codecService) {
+    public LinkService(LinkRepository linkRepository, CodecService codecService,
+                       LinkDtoEntityConverter linkDtoEntityConverter) {
         this.linkRepository = linkRepository;
         this.codecService = codecService;
+        this.linkDtoEntityConverter = linkDtoEntityConverter;
     }
 
     public URI getRedirectURL(String link) throws URISyntaxException {
-        var original = linkRepository.getOriginalByShort(link);
-        URI redirectUri = null;
-        if (original != null) {
-            var originalLink = original.getOriginalLink();
-            if (originalLink != null) {
-                redirectUri = new URI(originalLink);
-            }
+        var fromDb = linkRepository.getOriginalByShort(link);
+        if (originalLinkExists(fromDb)) {
+            URI redirectUri = new URI(fromDb.getOriginalLink());
+            incrementClickCountAndSave(fromDb);
+            return redirectUri;
         } else {
             throw new RuntimeException(URI_NOT_FOUND);
         }
-        return redirectUri;
     }
 
     public LinkDto getShortLink(String link) {
@@ -44,29 +45,32 @@ public class LinkService {
             throw new RuntimeException("No link provided");
         }
         var shortByOriginal = linkRepository.getShortByOriginal(link);
-        return LinkDto.builder()
-                .shortLink(getShortLink(link, shortByOriginal))
-                .originalLink(link)
-                .build();
+        LinkDto linkDto = shortByOriginal != null
+                ? linkDtoEntityConverter.toDto(shortByOriginal)
+                : linkDtoEntityConverter.toDto(generateNewLink(link));
+        linkDto.setShortLink(toServerLink(linkDto.getShortLink()));
+        return linkDto;
     }
 
-    private String getShortLink(String link, Link shortByOriginal) {
-        String shortLink = shortByOriginal != null
-                ? shortByOriginal.getShortLink()
-                : generateShortLink(link);
-        return toServerLink(shortLink);
+    private boolean originalLinkExists(Link link) {
+        return link != null && link.getOriginalLink() != null;
+    }
+
+    private Link generateNewLink(String link) {
+        var hash = codecService.generateLink();
+        return linkRepository.save(Link.builder()
+                .originalLink(link)
+                .shortLink(hash)
+                .timesClicked(0)
+                .build());
     }
 
     private String toServerLink(String hash) {
         return host + ":" + port + "/" + hash;
     }
 
-    private String generateShortLink(String link) {
-        var generated = codecService.generateLink();
-        linkRepository.save(Link.builder()
-                .originalLink(link)
-                .shortLink(generated)
-                .build());
-        return generated;
+    private void incrementClickCountAndSave(Link fromDb) {
+        fromDb.setTimesClicked(fromDb.getTimesClicked() + 1);
+        linkRepository.save(fromDb);
     }
 }

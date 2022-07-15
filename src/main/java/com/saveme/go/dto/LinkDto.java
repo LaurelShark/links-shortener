@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class LinkDto {
     private String originalLink;
     private String shortLink;
+    private Integer timesClicked;
 }

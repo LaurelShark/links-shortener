@@ -9,11 +9,10 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
 class RedirectLinkControllerIntegrationTest {
@@ -29,7 +28,7 @@ class RedirectLinkControllerIntegrationTest {
     @Test
     void shouldNotRedirect_whenShortLinkNotFound() {
         var nonExisting = "";
-        assertThrows(RuntimeException.class, () -> redirect(nonExisting), "No link provided");
+        Assertions.assertThrows(RuntimeException.class, () -> redirect(nonExisting), "No link provided");
     }
 
     @Test
@@ -42,8 +41,8 @@ class RedirectLinkControllerIntegrationTest {
         var split = generatedLink.getShortLink().split("/");
 
         var res = redirect(split[1]);
-        assertSame(HttpStatus.OK, res.getStatus());
-        assertEquals("gws", res.getHeaders().get("Server"));
+        Assertions.assertSame(HttpStatus.OK, res.getStatus());
+        Assertions.assertEquals("gws", res.getHeaders().get("Server"));
     }
 
     private HttpResponse<Object> redirect(String shortLink) {
